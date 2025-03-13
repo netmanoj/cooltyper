@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 interface StatsProps {
@@ -38,55 +40,99 @@ export default function Stats({
 }: StatsProps) {
   const currentTheme = isDarkTheme ? themes.dark : themes.light;
 
+  const cpm = time > 0 
+    ? Math.round((characters.correct + characters.incorrect) / (time / 60)) 
+    : 0;
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
       {/* WPM */}
-      <div className="flex flex-col items-center p-4 rounded-xl" style={{ backgroundColor: currentTheme.containerBg }}>
-        <span className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: themes.dark.primary }}>
+      <div 
+        className="flex flex-col items-center p-4 rounded-xl" 
+        style={{ backgroundColor: currentTheme.containerBg }}
+      >
+        <span 
+          className="text-3xl sm:text-4xl font-bold mb-1" 
+          style={{ color: currentTheme.primary }}
+        >
           {wpm}
         </span>
-        <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
-          wpm
+        <span 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          style={{ color: currentTheme.textDark }}
+        >
+          WPM
         </span>
       </div>
 
       {/* Accuracy */}
-      <div className="flex flex-col items-center p-4 rounded-xl" style={{ backgroundColor: currentTheme.containerBg }}>
-        <span className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: themes.dark.primary }}>
+      <div 
+        className="flex flex-col items-center p-4 rounded-xl" 
+        style={{ backgroundColor: currentTheme.containerBg }}
+      >
+        <span 
+          className="text-3xl sm:text-4xl font-bold mb-1" 
+          style={{ color: currentTheme.primary }}
+        >
           {accuracy}%
         </span>
-        <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
-          acc
+        <span 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          style={{ color: currentTheme.textDark }}
+        >
+          Accuracy
         </span>
       </div>
 
       {/* Characters */}
-      <div className="flex flex-col items-center p-4 rounded-xl" style={{ backgroundColor: currentTheme.containerBg }}>
-        <span className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: themes.dark.primary }}>
+      <div 
+        className="flex flex-col items-center p-4 rounded-xl" 
+        style={{ backgroundColor: currentTheme.containerBg }}
+      >
+        <span 
+          className="text-3xl sm:text-4xl font-bold mb-1" 
+          style={{ color: currentTheme.primary }}
+        >
           {characters.correct}
         </span>
-        <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
-          chars
+        <span 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          style={{ color: currentTheme.textDark }}
+        >
+          Chars
         </span>
-        <span className="text-[10px] mt-1 opacity-75 text-center" style={{ color: currentTheme.textDark }}>
+        <span 
+          className="text-[10px] mt-1 opacity-75 text-center" 
+          style={{ color: currentTheme.textDark }}
+        >
           {errors} errors
         </span>
       </div>
 
       {/* Time */}
-      <div className="flex flex-col items-center p-4 rounded-xl" style={{ backgroundColor: currentTheme.containerBg }}>
-        <span className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: themes.dark.primary }}>
+      <div 
+        className="flex flex-col items-center p-4 rounded-xl" 
+        style={{ backgroundColor: currentTheme.containerBg }}
+      >
+        <span 
+          className="text-3xl sm:text-4xl font-bold mb-1" 
+          style={{ color: currentTheme.primary }}
+        >
           {time}s
         </span>
-        <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
-          time
+        <span 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          style={{ color: currentTheme.textDark }}
+        >
+          Time
         </span>
-        <span className="text-[10px] mt-1 opacity-75 text-center" style={{ color: currentTheme.textDark }}>
-          {Math.round((characters.correct + characters.incorrect) / time)} cpm
+        <span 
+          className="text-[10px] mt-1 opacity-75 text-center" 
+          style={{ color: currentTheme.textDark }}
+        >
+          {cpm} CPM
         </span>
       </div>
     </div>
   );
 }
-
- 
