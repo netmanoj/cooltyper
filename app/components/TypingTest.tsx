@@ -155,7 +155,7 @@ export default function TypingTest() {
         timerRef.current = null;
       }
     };
-  }, [isActive, isTestComplete, handleTimerTick, isTestComplete]);
+  }, [isActive, isTestComplete, handleTimerTick]);
 
   // Handle keyboard input
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
