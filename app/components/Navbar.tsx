@@ -17,9 +17,31 @@ interface NavbarProps {
   isDarkTheme: boolean;
   onThemeToggle: () => void;
   currentMode: 'time' | 'words';
+  themes: {
+    dark: {
+      background: string;
+      text: string;
+      textDark: string;
+      primary: string;
+      containerBg: string;
+    };
+    light: {
+      background: string;
+      text: string;
+      textDark: string;
+      containerBg: string;
+    };
+  };
 }
 
-export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, isDarkTheme, onThemeToggle }: NavbarProps) {
+export default function Navbar({ 
+  onModeChange, 
+  onTimeChange, 
+  onWordCountChange, 
+  isDarkTheme, 
+  onThemeToggle,
+  themes 
+}: NavbarProps) {
   const [selectedMode, setSelectedMode] = useState('time');
   const [selectedTime, setSelectedTime] = useState(30);
   const [selectedWordCount, setSelectedWordCount] = useState(25);
@@ -29,12 +51,14 @@ export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, 
     onModeChange(mode as 'time' | 'words');
   };
 
+  const currentTheme = isDarkTheme ? themes.dark : themes.light;
+
   return (
-    <nav className="w-full bg-[#2c2e31] p-2 sm:p-4 mb-4 sm:mb-8 overflow-x-auto">
+    <nav className="w-full p-2 sm:p-4 mb-4 sm:mb-8 overflow-x-auto" style={{ backgroundColor: currentTheme.background }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 min-w-max">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#e2b714] px-2 sm:px-0">CoolType</h1>
+            <h1 className="text-xl sm:text-2xl font-bold px-2 sm:px-0" style={{ color: themes.dark.primary }}>CoolType</h1>
             
             <div className="flex items-center space-x-2 sm:space-x-4 px-2 sm:px-0">
               {testModes.map(({ id, icon: Icon, label }) => (
@@ -43,9 +67,13 @@ export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, 
                   onClick={() => handleModeChange(id)}
                   className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-2 rounded-md transition-colors text-sm sm:text-base ${
                     selectedMode === id
-                      ? 'text-[#e2b714] bg-[#323437]'
-                      : 'text-[#646669] hover:text-[#d1d0c5]'
+                      ? 'bg-opacity-50'
+                      : 'hover:bg-opacity-50'
                   }`}
+                  style={{ 
+                    backgroundColor: currentTheme.containerBg,
+                    color: selectedMode === id ? themes.dark.primary : currentTheme.textDark
+                  }}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>{label}</span>
@@ -64,9 +92,13 @@ export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, 
                     }}
                     className={`px-2 sm:px-3 py-1 rounded-md transition-colors text-sm sm:text-base ${
                       selectedTime === time
-                        ? 'text-[#e2b714] bg-[#323437]'
-                        : 'text-[#646669] hover:text-[#d1d0c5]'
+                        ? 'bg-opacity-50'
+                        : 'hover:bg-opacity-50'
                     }`}
+                    style={{ 
+                      backgroundColor: currentTheme.containerBg,
+                      color: selectedTime === time ? themes.dark.primary : currentTheme.textDark
+                    }}
                   >
                     {time}
                   </button>
@@ -85,9 +117,13 @@ export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, 
                     }}
                     className={`px-2 sm:px-3 py-1 rounded-md transition-colors text-sm sm:text-base ${
                       selectedWordCount === count
-                        ? 'text-[#e2b714] bg-[#323437]'
-                        : 'text-[#646669] hover:text-[#d1d0c5]'
+                        ? 'bg-opacity-50'
+                        : 'hover:bg-opacity-50'
                     }`}
+                    style={{ 
+                      backgroundColor: currentTheme.containerBg,
+                      color: selectedWordCount === count ? themes.dark.primary : currentTheme.textDark
+                    }}
                   >
                     {count}
                   </button>
@@ -99,9 +135,10 @@ export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, 
           <button
             onClick={onThemeToggle}
             className="p-2 rounded-lg transition-all hidden sm:block"
+            style={{ color: currentTheme.text }}
           >
             {isDarkTheme ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#d1d0c5]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="5"/>
                 <line x1="12" y1="1" x2="12" y2="3"/>
                 <line x1="12" y1="21" x2="12" y2="23"/>
@@ -113,7 +150,7 @@ export default function Navbar({ onModeChange, onTimeChange, onWordCountChange, 
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
               </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#323437]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
             )}

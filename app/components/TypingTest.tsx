@@ -260,16 +260,17 @@ export default function TypingTest() {
         color: isDarkTheme ? themes.dark.text : themes.light.text 
       }}
     >
-      <Navbar 
-        onModeChange={handleModeChange}
-        onTimeChange={handleTimeChange}
-        onWordCountChange={handleWordCountChange}
-        isDarkTheme={isDarkTheme}
-        onThemeToggle={() => setIsDarkTheme(!isDarkTheme)}
-        currentMode={testMode}
-      />
-      
-      <div className="max-w-5xl mx-auto px-4 py-2 sm:p-4">
+      <div className="w-full max-w-6xl mx-auto px-4">
+        <Navbar
+          onModeChange={handleModeChange}
+          onTimeChange={handleTimeChange}
+          onWordCountChange={handleWordCountChange}
+          isDarkTheme={isDarkTheme}
+          onThemeToggle={() => setIsDarkTheme(!isDarkTheme)}
+          currentMode={testMode}
+          themes={themes}
+        />
+        
         {testMode === 'time' && (
           <Timer 
             time={time}
