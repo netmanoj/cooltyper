@@ -3,6 +3,7 @@ import React from 'react';
 interface StatsProps {
   wpm: number;
   accuracy: number;
+  errors: number;
   characters: {
     correct: number;
     incorrect: number;
@@ -28,7 +29,8 @@ interface StatsProps {
 
 export default function Stats({ 
   wpm, 
-  accuracy, 
+  accuracy,
+  errors,
   characters, 
   time,
   isDarkTheme,
@@ -58,13 +60,13 @@ export default function Stats({
         </span>
       </div>
 
-      {/* Characters */}
+      {/* Errors */}
       <div className="flex flex-col items-center p-4 rounded-xl" style={{ backgroundColor: currentTheme.containerBg }}>
         <span className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: themes.dark.primary }}>
-          {characters.correct}/{characters.incorrect}/{characters.extra}/{characters.missed}
+          {errors}
         </span>
         <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
-          characters
+          errors
         </span>
       </div>
 
