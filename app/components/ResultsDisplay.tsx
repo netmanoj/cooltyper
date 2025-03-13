@@ -57,7 +57,25 @@ interface ResultsDisplayProps {
   };
 }
 
-const ResultsGraph = ({ typingData, isDarkTheme, themes }: { typingData: TypingDataPoint[], isDarkTheme: boolean, themes: { dark: { text: string; textDark: string; primary: string; containerBg: string; }; light: { text: string; textDark: string; containerBg: string; }; } }) => {
+interface ResultsGraphProps {
+  typingData: TypingDataPoint[];
+  isDarkTheme: boolean;
+  themes: {
+    dark: {
+      text: string;
+      textDark: string;
+      primary: string;
+      containerBg: string;
+    };
+    light: {
+      text: string;
+      textDark: string;
+      containerBg: string;
+    };
+  };
+}
+
+const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, themes }) => {
   const textColor = isDarkTheme ? themes.dark.text : themes.light.text;
   const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
@@ -257,7 +275,7 @@ export default function ResultsDisplay({ results, onRestart, isDarkTheme, themes
     ]
   };
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
@@ -289,7 +307,9 @@ export default function ResultsDisplay({ results, onRestart, isDarkTheme, themes
         },
         ticks: {
           color: currentTheme.textDark,
-          callback: (value: any) => `${value}s`,
+          callback: function(this: any, tickValue: number | string) {
+            return `${tickValue}s`;
+          },
           font: {
             size: 10
           }
@@ -391,48 +411,12 @@ export default function ResultsDisplay({ results, onRestart, isDarkTheme, themes
       </div>
 
       {/* Graph */}
-      <div className="bg-opacity-50 h-64 mb-6 p-4 rounded-xl" style={{ backgroundColor: currentTheme.background }}>
-        <Line data={chartData} options={{
-          ...chartOptions,
-          maintainAspectRatio: false,
-          scales: {
-            ...chartOptions.scales,
-            x: {
-              ...chartOptions.scales.x,
-              border: {
-                display: false
-              },
-              grid: {
-                ...chartOptions.scales.x.grid,
-                display: true,
-                color: `${currentTheme.textDark}1A`, // 10% opacity in hex
-              },
-              ticks: {
-                ...chartOptions.scales.x.ticks,
-                font: {
-                  size: 10
-                }
-              }
-            },
-            y: {
-              ...chartOptions.scales.y,
-              border: {
-                display: false
-              },
-              grid: {
-                ...chartOptions.scales.y.grid,
-                display: true,
-                color: `${currentTheme.textDark}1A`, // 10% opacity in hex
-              },
-              ticks: {
-                ...chartOptions.scales.y.ticks,
-                font: {
-                  size: 10
-                }
-              }
-            }
-          }
-        }} />
+      <div className="h-64 w-full p-4 rounded-xl mb-6" style={{ backgroundColor: currentTheme.background }}>
+        <ResultsGraph 
+          typingData={results.typingData}
+          isDarkTheme={isDarkTheme}
+          themes={themes}
+        />
       </div>
 
       {/* Buttons */}

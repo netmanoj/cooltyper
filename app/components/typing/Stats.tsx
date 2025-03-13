@@ -9,7 +9,6 @@ interface SpeedDataPoint {
 interface StatsProps {
   wpm: number;
   accuracy: number;
-  errors: number;
   characters: {
     correct: number;
     incorrect: number;
@@ -17,24 +16,29 @@ interface StatsProps {
     missed: number;
   };
   time: number;
-  speedData: { time: number; wpm: number; raw: number; }[];
-  isTestComplete: boolean;
+  themes: {
+    dark: {
+      text: string;
+      textDark: string;
+      primary: string;
+      containerBg: string;
+    };
+    light: {
+      text: string;
+      textDark: string;
+      containerBg: string;
+    };
+  };
   isDarkTheme: boolean;
-  themes: any;
-  isActive: boolean;
 }
 
 export default function Stats({ 
   wpm, 
   accuracy, 
-  errors, 
   characters, 
   time,
-  speedData,
-  isTestComplete,
   isDarkTheme,
-  themes,
-  isActive 
+  themes 
 }: StatsProps) {
   const currentTheme = isDarkTheme ? themes.dark : themes.light;
 
@@ -77,9 +81,6 @@ export default function Stats({
         </span>
         <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
           time
-        </span>
-        <span className="text-[10px] mt-1 opacity-50" style={{ color: currentTheme.textDark }}>
-          {new Date().toLocaleTimeString()} session
         </span>
       </div>
     </div>
