@@ -77,6 +77,10 @@ const ResultsGraph = ({ typingData, isDarkTheme, themes }: ResultsGraphProps) =>
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    },
     scales: {
       x: {
         title: {
@@ -90,7 +94,8 @@ const ResultsGraph = ({ typingData, isDarkTheme, themes }: ResultsGraphProps) =>
         ticks: {
           color: textColor,
           autoSkip: true,
-          maxTicksLimit: 10
+          maxTicksLimit: 10,
+          stepSize: 1
         },
         grid: {
           color: gridColor
@@ -107,7 +112,8 @@ const ResultsGraph = ({ typingData, isDarkTheme, themes }: ResultsGraphProps) =>
         },
         beginAtZero: true,
         ticks: {
-          color: textColor
+          color: textColor,
+          stepSize: 10
         },
         grid: {
           color: gridColor
@@ -116,17 +122,18 @@ const ResultsGraph = ({ typingData, isDarkTheme, themes }: ResultsGraphProps) =>
     },
     plugins: {
       legend: {
-        position: 'top' as const,
-        labels: {
-          color: textColor
-        }
+        display: false
       },
-      title: {
-        display: true,
-        text: 'Typing Speed Over Time',
-        color: textColor,
-        font: {
-          size: 14
+      tooltip: {
+        backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg,
+        titleColor: textColor,
+        bodyColor: textColor,
+        borderColor: themes.dark.primary,
+        borderWidth: 1,
+        padding: 10,
+        displayColors: false,
+        callbacks: {
+          label: (context) => `WPM: ${context.parsed.y}`
         }
       }
     }
@@ -140,14 +147,19 @@ const ResultsGraph = ({ typingData, isDarkTheme, themes }: ResultsGraphProps) =>
         data: typingData.map(point => point.wpm),
         borderColor: themes.dark.primary,
         backgroundColor: themes.dark.primary,
-        tension: 0.1,
-        fill: false
+        tension: 0.4,
+        fill: false,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: themes.dark.primary,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2
       }
     ]
   };
 
   return (
-    <div className="w-full h-[300px] bg-opacity-50 rounded-lg p-4" style={{ 
+    <div className="w-full h-[300px] rounded-lg p-4" style={{ 
       backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg 
     }}>
       <Line options={options} data={data} />
@@ -159,24 +171,24 @@ const ResultsDisplay = ({ results, onRestart, isDarkTheme, themes }: ResultsDisp
   if (!results) return null;
 
   return (
-    <div className="results-container space-y-6">
+    <div className="results-container space-y-6 mt-8">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="stat-item p-4 rounded-lg" style={{ 
+        <div className="stat-item p-4 rounded-lg flex flex-col items-center" style={{ 
           backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg 
         }}>
-          <h3 className="text-sm sm:text-base" style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }}>WPM</h3>
+          <h3 className="text-sm sm:text-base mb-2" style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }}>WPM</h3>
           <p className="text-2xl sm:text-3xl font-bold" style={{ color: themes.dark.primary }}>{Math.round(results.wpm)}</p>
         </div>
-        <div className="stat-item p-4 rounded-lg" style={{ 
+        <div className="stat-item p-4 rounded-lg flex flex-col items-center" style={{ 
           backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg 
         }}>
-          <h3 className="text-sm sm:text-base" style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }}>Accuracy</h3>
+          <h3 className="text-sm sm:text-base mb-2" style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }}>Accuracy</h3>
           <p className="text-2xl sm:text-3xl font-bold" style={{ color: themes.dark.primary }}>{Math.round(results.accuracy)}%</p>
         </div>
-        <div className="stat-item p-4 rounded-lg" style={{ 
+        <div className="stat-item p-4 rounded-lg flex flex-col items-center" style={{ 
           backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg 
         }}>
-          <h3 className="text-sm sm:text-base" style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }}>Time</h3>
+          <h3 className="text-sm sm:text-base mb-2" style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }}>Time</h3>
           <p className="text-2xl sm:text-3xl font-bold" style={{ color: themes.dark.primary }}>{results.duration.toFixed(1)}s</p>
         </div>
       </div>
@@ -192,7 +204,7 @@ const ResultsDisplay = ({ results, onRestart, isDarkTheme, themes }: ResultsDisp
       )}
 
       <button 
-        className="w-full py-3 rounded-lg font-semibold transition-colors"
+        className="w-full py-3 rounded-lg font-semibold transition-colors hover:opacity-90"
         style={{ 
           backgroundColor: themes.dark.primary,
           color: '#ffffff'
