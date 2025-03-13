@@ -7,6 +7,7 @@ import Timer from './typing/Timer';
 import TypingArea from './typing/TypingArea';
 import Stats from './typing/Stats';
 import FontSizeControl from './typing/FontSizeControl';
+import ResultsDisplay from './ResultsDisplay';
 import { generateTestText, themes, SpeedDataPoint } from './typing/utils';
 
 export default function TypingTest() {
@@ -311,18 +312,34 @@ export default function TypingTest() {
           isActive={isActive}
         />
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={resetTest}
-          className="w-full py-2 sm:py-3 mt-8 rounded-lg font-semibold transition-colors text-sm sm:text-base"
-          style={{ 
-            backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg,
-            color: isDarkTheme ? themes.dark.text : themes.light.text
-          }}
-        >
-          {isTestComplete ? 'Start New Test' : 'Reset Test'}
-        </motion.button>
+        {isTestComplete && (
+          <ResultsDisplay
+            results={{
+              wpm,
+              accuracy,
+              duration: time,
+              typingData: speedData
+            }}
+            onRestart={resetTest}
+            isDarkTheme={isDarkTheme}
+            themes={themes}
+          />
+        )}
+
+        {!isTestComplete && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={resetTest}
+            className="w-full py-2 sm:py-3 mt-8 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+            style={{ 
+              backgroundColor: isDarkTheme ? themes.dark.containerBg : themes.light.containerBg,
+              color: isDarkTheme ? themes.dark.text : themes.light.text
+            }}
+          >
+            Reset Test
+          </motion.button>
+        )}
       </div>
     </div>
   );
