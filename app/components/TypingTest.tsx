@@ -35,7 +35,6 @@ export default function TypingTest() {
   const [speedData, setSpeedData] = useState<SpeedDataPoint[]>([]);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [fontSize, setFontSize] = useState(35);
-  const [typingHistory, setTypingHistory] = useState<Array<{time: number, wpm: number}>>([]);
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -161,7 +160,7 @@ export default function TypingTest() {
         timerRef.current = null;
       }
     };
-  }, [isActive, isTestComplete, handleTimerTick]);
+  }, [isActive, isTestComplete, handleTimerTick, isTestComplete]);
 
   // Handle keyboard input
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
@@ -256,22 +255,6 @@ export default function TypingTest() {
     setWordCount(count);
     resetTest();
   };
-
-  // Add this to track typing history for the graph
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Update typing history periodically (e.g., every second or after each word)
-  useEffect(() => {
-    if (!isTestComplete && startTimeRef.current && currentIndex > 0) {
-      const currentTime = (Date.now() - startTimeRef.current) / 1000;
-      const currentWPM = Math.min(Math.round((charactersRef.current.correct / 5) / currentTime), 999);
-      
-      setTypingHistory(prev => [...prev, {
-        time: currentTime,
-        wpm: currentWPM
-      }]);
-    }
-  }, [currentIndex]); // Or use a timer interval for more regular updates
 
   return (
     <div 

@@ -1,3 +1,5 @@
+import { Line } from 'react-chartjs-2';
+
 const ResultsGraph = ({ typingData }) => {
   const options = {
     responsive: true,
@@ -34,7 +36,7 @@ const ResultsGraph = ({ typingData }) => {
 
   // Process data for the graph
   const data = {
-    labels: typingData.map((point, index) => Math.floor(point.time)),
+    labels: typingData.map((point) => Math.floor(point.time)),
     datasets: [
       {
         label: 'WPM',
@@ -86,4 +88,6 @@ const ResultsDisplay = ({ results, onRestart }) => {
       </button>
     </div>
   );
-}; 
+};
+
+export default ResultsDisplay; 
