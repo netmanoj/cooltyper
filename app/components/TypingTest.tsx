@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, MutableRefObject } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from './Navbar';
 import Timer from './typing/Timer';
@@ -8,11 +8,6 @@ import TypingArea from './typing/TypingArea';
 import Stats from './typing/Stats';
 import FontSizeControl from './typing/FontSizeControl';
 import { generateTestText, themes, SpeedDataPoint } from './typing/utils';
-
-interface Props {
-  containerRef: RefObject<HTMLDivElement>;
-  // ... other props
-}
 
 export default function TypingTest() {
   // State declarations
@@ -300,6 +295,7 @@ export default function TypingTest() {
           onFontSizeChange={setFontSize}
           isDarkTheme={isDarkTheme}
           themes={themes}
+          isTestComplete={isTestComplete}
         />
 
         <Stats 
@@ -312,8 +308,7 @@ export default function TypingTest() {
           isTestComplete={isTestComplete}
           isDarkTheme={isDarkTheme}
           themes={themes}
-          testMode={testMode}
-          wordCount={wordCount}
+          isActive={isActive}
         />
 
         <motion.button

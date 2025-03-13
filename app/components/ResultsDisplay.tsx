@@ -1,6 +1,47 @@
 import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
 
-const ResultsGraph = ({ typingData }) => {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+interface TypingDataPoint {
+  time: number;
+  wpm: number;
+}
+
+interface Results {
+  wpm: number;
+  accuracy: number;
+  duration: number;
+  typingData?: TypingDataPoint[];
+}
+
+interface ResultsGraphProps {
+  typingData: TypingDataPoint[];
+}
+
+interface ResultsDisplayProps {
+  results: Results;
+  onRestart: () => void;
+}
+
+const ResultsGraph = ({ typingData }: ResultsGraphProps) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -54,7 +95,7 @@ const ResultsGraph = ({ typingData }) => {
   );
 };
 
-const ResultsDisplay = ({ results, onRestart }) => {
+const ResultsDisplay = ({ results, onRestart }: ResultsDisplayProps) => {
   if (!results) return null;
 
   return (
