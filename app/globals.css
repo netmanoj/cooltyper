@@ -1,0 +1,85 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  --bg-primary: #323437;
+  --bg-secondary: #2c2e31;
+  --text-primary: #d1d0c5;
+  --text-secondary: #646669;
+  --text-accent: #e2b714;
+  --caret-color: #e2b714;
+  --error-color: #ca4754;
+  --success-color: #4caf50;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Roboto Mono', monospace;
+}
+
+.typing-text {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 2px;
+}
+
+.typing-text span {
+  display: inline-flex;
+  align-items: center;
+  height: 1.2em;
+  position: relative;
+}
+
+.char-correct {
+  color: var(--text-primary);
+}
+
+.char-incorrect {
+  color: var(--error-color);
+}
+
+.test-info {
+  color: var(--text-secondary);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb {
+  background: #666;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #888;
+} 
