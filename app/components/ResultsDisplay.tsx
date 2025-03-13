@@ -8,7 +8,10 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartOptions
+  ChartOptions,
+  Scale,
+  CoreScaleOptions,
+  TooltipItem
 } from 'chart.js';
 import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
@@ -108,7 +111,10 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
           color: textColor,
           autoSkip: true,
           maxTicksLimit: 10,
-          stepSize: 1
+          stepSize: 1,
+          callback: function(this: Scale<CoreScaleOptions>, value: number | string) {
+            return `${value}s`;
+          }
         },
         grid: {
           color: gridColor
@@ -129,7 +135,9 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
         ticks: {
           color: textColor,
           stepSize: 20, // Show ticks every 20 WPM
-          callback: (value) => `${value}`
+          callback: function(this: Scale<CoreScaleOptions>, value: number | string) {
+            return `${value}`;
+          }
         },
         grid: {
           color: gridColor
@@ -149,7 +157,9 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
         padding: 10,
         displayColors: false,
         callbacks: {
-          label: (context) => `WPM: ${Math.round(context.parsed.y)}`
+          label: function(context: TooltipItem<'line'>) {
+            return `WPM: ${Math.round(context.parsed.y)}`;
+          }
         }
       }
     }
@@ -258,85 +268,6 @@ export default function ResultsDisplay({ results, onRestart, isDarkTheme, themes
       }
     } catch (error) {
       console.error('Error sharing results:', error);
-    }
-  };
-
-  const chartData = {
-    labels: results.typingData.map(d => d.time),
-    datasets: [
-      {
-        label: 'WPM',
-        data: results.typingData.map(d => d.wpm),
-        borderColor: themes.dark.primary,
-        backgroundColor: themes.dark.primary,
-        tension: 0.4,
-        pointRadius: 0,
-      }
-    ]
-  };
-
-  const chartOptions: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: 'index' as const,
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        display: false
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: currentTheme.containerBg,
-        titleColor: currentTheme.text,
-        bodyColor: currentTheme.text,
-        displayColors: false,
-        callbacks: {
-          title: () => '',
-          label: (context: any) => `${Math.round(context.parsed.y)} WPM`
-        }
-      }
-    },
-    scales: {
-      x: {
-        display: true,
-        grid: {
-          color: `${currentTheme.textDark}1A`,
-          display: true
-        },
-        ticks: {
-          color: currentTheme.textDark,
-          callback: function(this: any, tickValue: number | string) {
-            return `${tickValue}s`;
-          },
-          font: {
-            size: 10
-          }
-        },
-        border: {
-          display: false
-        }
-      },
-      y: {
-        display: true,
-        min: 0,
-        max: 200,
-        grid: {
-          color: `${currentTheme.textDark}1A`,
-          display: true
-        },
-        ticks: {
-          color: currentTheme.textDark,
-          stepSize: 20,
-          font: {
-            size: 10
-          }
-        },
-        border: {
-          display: false
-        }
-      }
     }
   };
 

@@ -1,11 +1,5 @@
 import React from 'react';
 
-interface SpeedDataPoint {
-  time: number;
-  wpm: number;
-  raw: number;
-}
-
 interface StatsProps {
   wpm: number;
   accuracy: number;
