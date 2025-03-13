@@ -60,13 +60,16 @@ export default function Stats({
         </span>
       </div>
 
-      {/* Errors */}
+      {/* Characters */}
       <div className="flex flex-col items-center p-4 rounded-xl" style={{ backgroundColor: currentTheme.containerBg }}>
         <span className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: themes.dark.primary }}>
-          {errors}
+          {characters.correct}
         </span>
         <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
-          errors
+          chars
+        </span>
+        <span className="text-[10px] mt-1 opacity-75 text-center" style={{ color: currentTheme.textDark }}>
+          {errors} errors
         </span>
       </div>
 
@@ -77,6 +80,9 @@ export default function Stats({
         </span>
         <span className="text-xs sm:text-sm uppercase tracking-wider font-medium" style={{ color: currentTheme.textDark }}>
           time
+        </span>
+        <span className="text-[10px] mt-1 opacity-75 text-center" style={{ color: currentTheme.textDark }}>
+          {Math.round((characters.correct + characters.incorrect) / time)} cpm
         </span>
       </div>
     </div>
