@@ -58,7 +58,7 @@ export default function Navbar({
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 min-w-max">
-            <h1 className="text-xl sm:text-2xl font-bold px-2 sm:px-0" style={{ color: themes.dark.primary }}>CoolType</h1>
+            <h1 className="text-xl sm:text-2xl font-bold px-2 sm:px-0" style={{ color: themes.dark.primary }}>CoolTyper</h1>
             
             <div className="flex items-center space-x-2 sm:space-x-4 px-2 sm:px-0">
               {testModes.map(({ id, icon: Icon, label }) => (

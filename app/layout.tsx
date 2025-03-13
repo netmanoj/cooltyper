@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Cool Type - Typing Speed Test",
-  description: "Test and improve your typing speed with Cool Type",
+  title: "CoolTyper - Modern Typing Speed Test",
+  description: "Test and improve your typing speed with CoolTyper - A modern, beautiful typing test application",
 };
 
 export default function RootLayout({

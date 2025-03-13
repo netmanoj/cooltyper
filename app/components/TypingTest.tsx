@@ -36,6 +36,7 @@ export default function TypingTest() {
   const containerRef = useRef<HTMLDivElement>(null);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<number | null>(null);
+  const selectedTimeRef = useRef(30);
   const inputRef = useRef(input);
   const textRef = useRef(text);
   const charactersRef = useRef(characters);
@@ -115,9 +116,9 @@ export default function TypingTest() {
   const calculateResults = useCallback(() => {
     if (!startTimeRef.current) return;
 
-    const timeElapsed = (Date.now() - startTimeRef.current) / 1000 / 60;
+    const timeElapsed = (Date.now() - startTimeRef.current) / 1000;
     const correctChars = charactersRef.current.correct;
-    const finalWpm = Math.min(Math.round((correctChars / 5) / timeElapsed), 999);
+    const finalWpm = Math.min(Math.round((correctChars / 5) / (timeElapsed / 60)), 999);
     const totalTyped = correctChars + charactersRef.current.incorrect;
     const finalAccuracy = totalTyped > 0
       ? Math.round((correctChars / totalTyped) * 100)
@@ -127,7 +128,15 @@ export default function TypingTest() {
     setAccuracy(finalAccuracy);
     setErrors(charactersRef.current.incorrect);
     setIsTestComplete(true);
-  }, []);
+    
+    // For time mode, use the initial selected time
+    if (testMode === 'time') {
+      setTime(selectedTimeRef.current);
+    } else {
+      // For words mode, use the actual elapsed time
+      setTime(Math.round(timeElapsed));
+    }
+  }, [testMode]);
 
   // Timer management
   const handleTimerTick = useCallback(() => {
@@ -244,6 +253,7 @@ export default function TypingTest() {
   // Time/word count change handlers
   const handleTimeChange = (newTime: number) => {
     setTime(newTime);
+    selectedTimeRef.current = newTime;
     resetTest();
   };
 
