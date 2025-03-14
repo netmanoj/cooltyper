@@ -339,10 +339,8 @@ export default function TypingTest() {
           characters={characters}
           time={time}
           speedData={speedData}
-          isTestComplete={isTestComplete}
           isDarkTheme={isDarkTheme}
           themes={themes}
-          isActive={isActive}
         />
 
         {isTestComplete && (

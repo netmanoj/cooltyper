@@ -29,8 +29,6 @@ interface StatsProps {
     };
   };
   isDarkTheme: boolean;
-  isTestComplete: boolean;
-  isActive: boolean;
 }
 
 export default function Stats({ 
@@ -40,9 +38,7 @@ export default function Stats({
   characters, 
   time,
   isDarkTheme,
-  themes,
-  isTestComplete,
-  isActive
+  themes
 }: StatsProps) {
   const currentTheme = isDarkTheme ? themes.dark : themes.light;
 
