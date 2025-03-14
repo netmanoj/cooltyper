@@ -89,17 +89,23 @@ export default function TypingTest() {
     
     // Update WPM in real-time
     if (startTimeRef.current) {
-      const timeElapsed = (Date.now() - startTimeRef.current) / 1000 / 60;
-      const currentWpm = Math.min(Math.round((newCharacters.correct / 5) / timeElapsed), 999);
-      
-      if (!isNaN(currentWpm)) {
-        setWpm(currentWpm);
-        setSpeedData(prev => {
-          const currentSecond = Math.floor((Date.now() - startTimeRef.current!) / 1000);
-          return prev.some(p => p.time === currentSecond) 
-            ? prev 
-            : [...prev, { time: currentSecond, wpm: currentWpm, raw: currentWpm }];
-        });
+      const timeElapsed = (Date.now() - startTimeRef.current) / 1000 / 60; // Convert to minutes
+      if (timeElapsed > 0) {
+        // Calculate WPM: (characters typed per minute) / 5 characters per word
+        const charsPerMinute = newCharacters.correct / timeElapsed;
+        const grossWpm = Math.round(charsPerMinute / 5);
+        const currentWpm = Math.min(Math.max(0, grossWpm), 250);
+        
+        if (!isNaN(currentWpm)) {
+          setWpm(currentWpm);
+          setSpeedData(prev => {
+            const currentSecond = Math.floor((Date.now() - startTimeRef.current!) / 1000);
+            // Only add new data point if it's a new second
+            return prev.some(p => p.time === currentSecond) 
+              ? prev 
+              : [...prev, { time: currentSecond, wpm: currentWpm, raw: grossWpm }];
+          });
+        }
       }
     }
 
@@ -118,7 +124,12 @@ export default function TypingTest() {
 
     const timeElapsed = (Date.now() - startTimeRef.current) / 1000;
     const correctChars = charactersRef.current.correct;
-    const finalWpm = Math.min(Math.round((correctChars / 5) / (timeElapsed / 60)), 999);
+    
+    // Calculate final WPM: (characters typed per minute) / 5 characters per word
+    const charsPerMinute = (correctChars / timeElapsed) * 60; // Convert to per minute
+    const grossWpm = Math.round(charsPerMinute / 5);
+    const finalWpm = Math.min(Math.max(0, grossWpm), 250);
+    
     const totalTyped = correctChars + charactersRef.current.incorrect;
     const finalAccuracy = totalTyped > 0
       ? Math.round((correctChars / totalTyped) * 100)
@@ -171,6 +182,13 @@ export default function TypingTest() {
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
     if (isTestComplete || e.ctrlKey || e.altKey || e.metaKey) return;
 
+    // Handle Enter key to stop test in non-time modes
+    if (e.key === 'Enter' && testMode !== 'time' && isActive) {
+      e.preventDefault();
+      calculateResults();
+      return;
+    }
+
     // Start test on first key press
     if (!isActive) {
       startTimeRef.current = Date.now();
@@ -194,16 +212,20 @@ export default function TypingTest() {
         // Update statistics
         updateStats(e.key, prev.length);
 
-        // Check test completion
+        // Check test completion for word count mode
         if (testMode === 'words') {
           const typedWords = newInput.split(/\s+/).length;
           if (typedWords >= wordCount) {
             calculateResults();
           }
         } else if (newInput.length >= textRef.current.length) {
-          // Only generate new text if we've completed the current text
-          setText(generateTestText(time));
-          setInput('');
+          // Only generate new text if we've completed the current text and in time mode
+          if (testMode === 'time') {
+            setText(generateTestText(time));
+            setInput('');
+          } else {
+            calculateResults();
+          }
         }
 
         return newInput;

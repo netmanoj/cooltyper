@@ -13,6 +13,7 @@ interface StatsProps {
     missed: number;
   };
   time: number;
+  speedData: Array<{ time: number; wpm: number; raw: number }>;
   themes: {
     dark: {
       text: string;
@@ -23,10 +24,13 @@ interface StatsProps {
     light: {
       text: string;
       textDark: string;
+      primary: string;
       containerBg: string;
     };
   };
   isDarkTheme: boolean;
+  isTestComplete: boolean;
+  isActive: boolean;
 }
 
 export default function Stats({ 
@@ -36,7 +40,9 @@ export default function Stats({
   characters, 
   time,
   isDarkTheme,
-  themes 
+  themes,
+  isTestComplete,
+  isActive
 }: StatsProps) {
   const currentTheme = isDarkTheme ? themes.dark : themes.light;
 
@@ -45,20 +51,20 @@ export default function Stats({
     : 0;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-8">
       {/* WPM */}
       <div 
-        className="flex flex-col items-center p-4 rounded-xl" 
+        className="flex flex-col items-center p-5 rounded-xl" 
         style={{ backgroundColor: currentTheme.containerBg }}
       >
         <span 
-          className="text-3xl sm:text-4xl font-bold mb-1" 
+          className="text-4xl sm:text-5xl font-bold" 
           style={{ color: currentTheme.primary }}
         >
           {wpm}
         </span>
         <span 
-          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium mt-3" 
           style={{ color: currentTheme.textDark }}
         >
           WPM
@@ -67,17 +73,17 @@ export default function Stats({
 
       {/* Accuracy */}
       <div 
-        className="flex flex-col items-center p-4 rounded-xl" 
+        className="flex flex-col items-center p-5 rounded-xl" 
         style={{ backgroundColor: currentTheme.containerBg }}
       >
         <span 
-          className="text-3xl sm:text-4xl font-bold mb-1" 
+          className="text-4xl sm:text-5xl font-bold" 
           style={{ color: currentTheme.primary }}
         >
           {accuracy}%
         </span>
         <span 
-          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium mt-3" 
           style={{ color: currentTheme.textDark }}
         >
           Accuracy
@@ -86,48 +92,48 @@ export default function Stats({
 
       {/* Characters */}
       <div 
-        className="flex flex-col items-center p-4 rounded-xl" 
+        className="flex flex-col items-center p-5 rounded-xl" 
         style={{ backgroundColor: currentTheme.containerBg }}
       >
         <span 
-          className="text-3xl sm:text-4xl font-bold mb-1" 
+          className="text-4xl sm:text-5xl font-bold" 
           style={{ color: currentTheme.primary }}
         >
           {characters.correct}
         </span>
         <span 
-          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium mt-3" 
           style={{ color: currentTheme.textDark }}
         >
-          Chars
+          Characters
         </span>
         <span 
-          className="text-[10px] mt-1 opacity-75 text-center" 
+          className="text-[11px] mt-2 opacity-75 text-center" 
           style={{ color: currentTheme.textDark }}
         >
-          {errors} errors
+          {errors} error{errors !== 1 ? 's' : ''}
         </span>
       </div>
 
       {/* Time */}
       <div 
-        className="flex flex-col items-center p-4 rounded-xl" 
+        className="flex flex-col items-center p-5 rounded-xl" 
         style={{ backgroundColor: currentTheme.containerBg }}
       >
         <span 
-          className="text-3xl sm:text-4xl font-bold mb-1" 
+          className="text-4xl sm:text-5xl font-bold" 
           style={{ color: currentTheme.primary }}
         >
           {time}s
         </span>
         <span 
-          className="text-xs sm:text-sm uppercase tracking-wider font-medium" 
+          className="text-xs sm:text-sm uppercase tracking-wider font-medium mt-3" 
           style={{ color: currentTheme.textDark }}
         >
           Time
         </span>
         <span 
-          className="text-[10px] mt-1 opacity-75 text-center" 
+          className="text-[11px] mt-2 opacity-75 text-center" 
           style={{ color: currentTheme.textDark }}
         >
           {cpm} CPM

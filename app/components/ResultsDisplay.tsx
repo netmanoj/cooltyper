@@ -82,13 +82,24 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
   const textColor = isDarkTheme ? themes.dark.text : themes.light.text;
   const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
-  // Filter out unrealistic WPM values and ensure data starts from 0
+  // Filter out initial spike and ensure data starts from 0
   const filteredData = typingData
-    .filter(point => point.wpm <= 200) // Filter out unrealistic WPM values
+    .filter(point => point.time >= 1) // Remove data points before 1 second
     .map(point => ({
       ...point,
-      wpm: Math.max(0, Math.min(200, point.wpm)) // Clamp WPM between 0 and 200
+      wpm: Math.round(Math.max(0, point.wpm)) // Round WPM to whole numbers and ensure non-negative
     }));
+
+  // Add a zero point at the start for better visualization
+  const dataWithStart = [
+    { time: 0, wpm: 0, raw: 0 },
+    ...filteredData
+  ];
+
+  // Find maximum WPM and round up to nearest 10
+  const maxValue = Math.max(...filteredData.map(point => point.wpm));
+  const yAxisMax = Math.ceil(maxValue / 10) * 10;
+  const stepSize = Math.max(5, Math.ceil(yAxisMax / 10));
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -96,6 +107,14 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
     interaction: {
       intersect: false,
       mode: 'index'
+    },
+    layout: {
+      padding: {
+        top: 10,
+        right: 10,
+        bottom: 15,
+        left: 10
+      }
     },
     scales: {
       x: {
@@ -105,19 +124,28 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
           color: textColor,
           font: {
             size: 12
-          }
+          },
+          padding: { top: 15 }
         },
         ticks: {
           color: textColor,
           autoSkip: true,
           maxTicksLimit: 10,
           stepSize: 1,
+          padding: 8,
+          font: {
+            size: 11
+          },
           callback: function(this: Scale<CoreScaleOptions>, value: number | string) {
             return `${value}s`;
           }
         },
         grid: {
-          color: gridColor
+          color: gridColor,
+          drawTicks: false
+        },
+        border: {
+          display: false
         }
       },
       y: {
@@ -127,20 +155,29 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
           color: textColor,
           font: {
             size: 12
-          }
+          },
+          padding: { top: 0, bottom: 0 }
         },
         beginAtZero: true,
         min: 0,
-        max: 200, // Set maximum Y-axis value to 200 WPM
+        max: yAxisMax,
         ticks: {
           color: textColor,
-          stepSize: 20, // Show ticks every 20 WPM
+          stepSize: stepSize,
+          padding: 8,
+          font: {
+            size: 11
+          },
           callback: function(this: Scale<CoreScaleOptions>, value: number | string) {
-            return `${value}`;
+            return Math.round(Number(value));
           }
         },
         grid: {
-          color: gridColor
+          color: gridColor,
+          drawTicks: false
+        },
+        border: {
+          display: false
         }
       }
     },
@@ -166,11 +203,11 @@ const ResultsGraph: React.FC<ResultsGraphProps> = ({ typingData, isDarkTheme, th
   };
 
   const data = {
-    labels: filteredData.map((point) => Math.floor(point.time)),
+    labels: dataWithStart.map((point) => Math.floor(point.time)),
     datasets: [
       {
         label: 'WPM',
-        data: filteredData.map(point => point.wpm),
+        data: dataWithStart.map(point => Math.round(point.wpm)),
         borderColor: themes.dark.primary,
         backgroundColor: themes.dark.primary,
         tension: 0.4,
@@ -342,7 +379,7 @@ export default function ResultsDisplay({ results, onRestart, isDarkTheme, themes
       </div>
 
       {/* Graph */}
-      <div className="h-64 w-full p-4 rounded-xl mb-6" style={{ backgroundColor: currentTheme.background }}>
+      <div className="h-64 w-full p-4 rounded-xl mb-8" style={{ backgroundColor: currentTheme.background }}>
         <ResultsGraph 
           typingData={results.typingData}
           isDarkTheme={isDarkTheme}
@@ -351,7 +388,7 @@ export default function ResultsDisplay({ results, onRestart, isDarkTheme, themes
       </div>
 
       {/* Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 mt-2">
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
