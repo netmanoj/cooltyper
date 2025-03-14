@@ -21,7 +21,7 @@ interface TypingAreaProps {
       containerBg: string;
     };
   };
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  containerRef: React.RefObject<HTMLDivElement>;
   onContainerClick: () => void;
 }
 
