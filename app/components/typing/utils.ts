@@ -11,6 +11,19 @@ export const commonWords = [
   "even", "new", "want", "because", "any", "these", "give", "day", "most", "us"
 ];
 
+export const quotes = [
+  "The only way to do great work is to love what you do.",
+  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+  "Life is what happens when you're busy making other plans.",
+  "The future belongs to those who believe in the beauty of their dreams.",
+  "It does not matter how slowly you go as long as you do not stop.",
+  "Everything you've ever wanted is on the other side of fear.",
+  "The best way to predict the future is to create it.",
+  "The journey of a thousand miles begins with one step.",
+  "The only impossible journey is the one you never begin.",
+  "What you get by achieving your goals is not as important as what you become by achieving your goals."
+];
+
 export const themes = {
   dark: {
     background: '#323437',
@@ -30,7 +43,17 @@ export const themes = {
   }
 };
 
-export const generateTestText = (count: number, mode: 'time' | 'words' = 'time') => {
+export const generateTestText = (count: number, mode: 'time' | 'words' | 'quote' | 'custom' = 'time', customText?: string) => {
+  // For custom mode, return the provided text
+  if (mode === 'custom' && customText) {
+    return customText;
+  }
+
+  // For quote mode, return a random quote
+  if (mode === 'quote') {
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  }
+
   // Scale word count based on test duration for time mode
   let wordCount;
   if (mode === 'time') {

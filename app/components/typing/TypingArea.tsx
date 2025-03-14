@@ -80,11 +80,10 @@ const TypingArea: React.FC<TypingAreaProps> = ({
           );
         })}
       </div>
-      {!isTestComplete && (
-        <div style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }} className="text-xs sm:text-sm mt-2 sm:mt-4">
-          {isActive ? 'typing...' : 'click here or start typing to begin'}
-        </div>
-      )}
+      
+      <div style={{ color: isDarkTheme ? themes.dark.textDark : themes.light.textDark }} className="text-xs sm:text-sm mt-2 sm:mt-4">
+        {isActive ? 'typing...' : 'click here or start typing to begin'}
+      </div>
     </div>
   );
 };
