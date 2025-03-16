@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -22,81 +22,89 @@ export default function TypingHistory() {
   const { user } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchHistory() {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        console.log('Fetching history for user:', {
-          userId: user.id,
-          userEmail: user.email,
-          timestamp: new Date().toISOString()
-        });
-
-        const { data, error } = await supabase
-          .from('typing_results')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching results:', error);
-          setError(error.message);
-          throw error;
-        }
-        
-        console.log('Fetched typing results:', {
-          count: data?.length || 0,
-          firstResult: data?.[0],
-          lastResult: data?.[data.length - 1]
-        });
-        
-        // Format the data
-        const formattedData = data?.map(result => ({
-          ...result,
-          wpm: Math.round(result.wpm),
-          accuracy: Math.round(result.accuracy),
-          duration: result.duration || 0
-        })) || [];
-        
-        setResults(formattedData);
-        setError(null);
-      } catch (error) {
-        console.error('Error fetching typing history:', error);
-        setError(error instanceof Error ? error.message : 'Failed to fetch history');
-      } finally {
-        setLoading(false);
-      }
+  const fetchHistory = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      setResults([]);
+      return;
     }
 
+    try {
+      console.log('Fetching history for user:', {
+        userId: user.id,
+        userEmail: user.email,
+        timestamp: new Date().toISOString()
+      });
+
+      const { data, error } = await supabase
+        .from('typing_results')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching results:', error);
+        setError(error.message);
+        throw error;
+      }
+      
+      console.log('Fetched typing results:', {
+        count: data?.length || 0,
+        firstResult: data?.[0],
+        lastResult: data?.[data.length - 1]
+      });
+      
+      // Format the data
+      const formattedData = data?.map(result => ({
+        ...result,
+        wpm: Math.round(result.wpm),
+        accuracy: Math.round(result.accuracy),
+        duration: result.duration || 0
+      })) || [];
+      
+      setResults(formattedData);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching typing history:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch history');
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
     fetchHistory();
 
     // Set up real-time subscription for new results
-    const channel = supabase
+    let channel = supabase
       .channel('typing_results_changes')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'typing_results',
           filter: `user_id=eq.${user?.id}`
         },
-        (payload) => {
-          console.log('New result received:', payload);
-          setResults(current => [payload.new as TestResult, ...current]);
+        async (payload) => {
+          console.log('Database change detected:', payload);
+          
+          // Refresh the entire list to ensure consistency
+          await fetchHistory();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
+    // Cleanup subscription on unmount
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, fetchHistory]);
 
+  // Handle auth state
   if (!user) {
     return (
       <div className="text-center py-4">
@@ -111,31 +119,58 @@ export default function TypingHistory() {
     );
   }
 
+  // Handle loading state
   if (loading) {
-    return <div className="text-center py-4 text-gray-400">Loading history...</div>;
+    return (
+      <div className="text-center py-4">
+        <div className="text-gray-400">Loading history...</div>
+        <div className="mt-2 text-sm text-gray-500">Please wait while we fetch your results</div>
+      </div>
+    );
   }
 
+  // Handle error state
   if (error) {
     return (
-      <div className="text-center py-4 text-red-400">
-        Error: {error}
+      <div className="text-center py-4">
+        <div className="text-red-400 mb-2">Error: {error}</div>
         <button
-          onClick={() => window.location.reload()}
-          className="ml-4 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition-colors"
+          onClick={() => fetchHistory()}
+          className="px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition-colors"
         >
-          Retry
+          Try Again
         </button>
       </div>
     );
   }
 
+  // Handle empty state
   if (results.length === 0) {
-    return <div className="text-center py-4 text-gray-400">No typing tests completed yet.</div>;
+    return (
+      <div className="text-center py-4">
+        <div className="text-gray-400 mb-2">No typing tests completed yet</div>
+        <button
+          onClick={() => router.push('/')}
+          className="px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition-colors"
+        >
+          Take a Test
+        </button>
+      </div>
+    );
   }
 
+  // Render results table
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-200">Typing History</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-200">Your Typing History</h2>
+        <button
+          onClick={() => fetchHistory()}
+          className="px-3 py-1 text-sm bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition-colors"
+        >
+          Refresh
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-[#262626] border border-gray-700 rounded-lg">
           <thead>
