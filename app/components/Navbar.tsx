@@ -1,162 +1,180 @@
 'use client';
 
-import { useState } from 'react';
-import { ClockIcon, DocumentTextIcon, ChatBubbleLeftIcon, BeakerIcon } from '@heroicons/react/24/outline';
-
-const testModes = [
-  { id: 'time', icon: ClockIcon, label: 'time' },
-  { id: 'words', icon: DocumentTextIcon, label: 'words' },
-  { id: 'quote', icon: ChatBubbleLeftIcon, label: 'quote' },
-  { id: 'custom', icon: BeakerIcon, label: 'custom' },
-];
+import { useState, useEffect } from 'react';
+import { ClockIcon, DocumentTextIcon, ChatBubbleLeftIcon, BeakerIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../contexts/AuthContext';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
-  onModeChange: (mode: 'time' | 'words') => void;
-  onTimeChange?: (time: number) => void;
-  onWordCountChange?: (count: number) => void;
+  onModeChange: (mode: 'time' | 'words' | 'quote' | 'custom') => void;
+  onTimeChange: (time: number) => void;
+  onWordCountChange: (count: number) => void;
   isDarkTheme: boolean;
   onThemeToggle: () => void;
-  currentMode: 'time' | 'words';
-  themes: {
-    dark: {
-      background: string;
-      text: string;
-      textDark: string;
-      primary: string;
-      containerBg: string;
-    };
-    light: {
-      background: string;
-      text: string;
-      textDark: string;
-      containerBg: string;
-    };
-  };
+  currentMode: 'time' | 'words' | 'quote' | 'custom';
+  themes: any;
 }
 
-export default function Navbar({ 
-  onModeChange, 
-  onTimeChange, 
-  onWordCountChange, 
-  isDarkTheme, 
+export default function Navbar({
+  onModeChange,
+  onTimeChange,
+  onWordCountChange,
+  isDarkTheme,
   onThemeToggle,
-  themes 
+  currentMode,
+  themes,
 }: NavbarProps) {
-  const [selectedMode, setSelectedMode] = useState('time');
+  const { user, signOut } = useAuth();
   const [selectedTime, setSelectedTime] = useState(30);
-  const [selectedWordCount, setSelectedWordCount] = useState(25);
+  const router = useRouter();
 
-  const handleModeChange = (mode: string) => {
-    setSelectedMode(mode);
-    onModeChange(mode as 'time' | 'words');
-  };
-
-  const currentTheme = isDarkTheme ? themes.dark : themes.light;
+  useEffect(() => {
+    console.log('Navbar - User state:', user ? 'logged in' : 'not logged in');
+  }, [user]);
 
   return (
-    <nav className="w-full p-2 sm:p-4 mb-4 sm:mb-8 overflow-x-auto" style={{ backgroundColor: currentTheme.background }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 min-w-max">
-            <h1 className="text-xl sm:text-2xl font-bold px-2 sm:px-0" style={{ color: themes.dark.primary }}>CoolTyper</h1>
-            
-            <div className="flex items-center space-x-2 sm:space-x-4 px-2 sm:px-0">
-              {testModes.map(({ id, icon: Icon, label }) => (
-                <button
-                  key={id}
-                  onClick={() => handleModeChange(id)}
-                  className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-2 rounded-md transition-colors text-sm sm:text-base ${
-                    selectedMode === id
-                      ? 'bg-opacity-50'
-                      : 'hover:bg-opacity-50'
-                  }`}
-                  style={{ 
-                    backgroundColor: currentTheme.containerBg,
-                    color: selectedMode === id ? themes.dark.primary : currentTheme.textDark
-                  }}
-                >
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>{label}</span>
-                </button>
-              ))}
-            </div>
+    <nav className="w-full py-4 px-2 sm:px-4 bg-[#262626] rounded-lg mb-8">
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:justify-between">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+          <Link href="/" className="text-xl font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
+            CoolTyper
+          </Link>
 
-            {selectedMode === 'time' && (
-              <div className="flex items-center space-x-2 px-2 sm:px-0">
-                {[15, 30, 60, 120].map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => {
-                      setSelectedTime(time);
-                      onTimeChange?.(time);
-                    }}
-                    className={`px-2 sm:px-3 py-1 rounded-md transition-colors text-sm sm:text-base ${
-                      selectedTime === time
-                        ? 'bg-opacity-50'
-                        : 'hover:bg-opacity-50'
-                    }`}
-                    style={{ 
-                      backgroundColor: currentTheme.containerBg,
-                      color: selectedTime === time ? themes.dark.primary : currentTheme.textDark
-                    }}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="flex flex-wrap justify-center gap-2">
+            <button
+              onClick={() => onModeChange('time')}
+              className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm transition-colors ${
+                currentMode === 'time' ? 'text-yellow-500 bg-[#303030]' : 'text-gray-400 bg-[#262626] hover:bg-[#303030]'
+              }`}
+            >
+              <ClockIcon className="w-4 h-4 mr-1.5" />
+              time
+            </button>
 
-            {selectedMode === 'words' && (
-              <div className="flex items-center space-x-2 px-2 sm:px-0">
-                {[10, 25, 50, 100].map((count) => (
-                  <button
-                    key={count}
-                    onClick={() => {
-                      setSelectedWordCount(count);
-                      onWordCountChange?.(count);
-                    }}
-                    className={`px-2 sm:px-3 py-1 rounded-md transition-colors text-sm sm:text-base ${
-                      selectedWordCount === count
-                        ? 'bg-opacity-50'
-                        : 'hover:bg-opacity-50'
-                    }`}
-                    style={{ 
-                      backgroundColor: currentTheme.containerBg,
-                      color: selectedWordCount === count ? themes.dark.primary : currentTheme.textDark
-                    }}
-                  >
-                    {count}
-                  </button>
-                ))}
-              </div>
-            )}
+            <button
+              onClick={() => onModeChange('words')}
+              className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm transition-colors ${
+                currentMode === 'words' ? 'text-yellow-500 bg-[#303030]' : 'text-gray-400 bg-[#262626] hover:bg-[#303030]'
+              }`}
+            >
+              <DocumentTextIcon className="w-4 h-4 mr-1.5" />
+              words
+            </button>
+
+            <button
+              onClick={() => onModeChange('quote')}
+              className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm transition-colors ${
+                currentMode === 'quote' ? 'text-yellow-500 bg-[#303030]' : 'text-gray-400 bg-[#262626] hover:bg-[#303030]'
+              }`}
+            >
+              <ChatBubbleLeftIcon className="w-4 h-4 mr-1.5" />
+              quote
+            </button>
+
+            <button
+              onClick={() => onModeChange('custom')}
+              className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm transition-colors ${
+                currentMode === 'custom' ? 'text-yellow-500 bg-[#303030]' : 'text-gray-400 bg-[#262626] hover:bg-[#303030]'
+              }`}
+            >
+              <BeakerIcon className="w-4 h-4 mr-1.5" />
+              custom
+            </button>
           </div>
+        </div>
 
+        <div className="flex items-center gap-2">
           <button
             onClick={onThemeToggle}
-            className="p-2 rounded-lg transition-all hidden sm:block"
-            style={{ color: currentTheme.text }}
+            className="p-2 rounded-lg text-gray-400 transition-colors bg-[#303030] hover:bg-[#404040]"
           >
-            {isDarkTheme ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3"/>
-                <line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/>
-                <line x1="21" y1="12" x2="23" y2="12"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-              </svg>
-            )}
+            {isDarkTheme ? '🌞' : '🌙'}
           </button>
+
+          {user ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm text-gray-400 bg-[#303030]">
+                <UserCircleIcon className="w-4 h-4 mr-1.5" />
+                {user.email?.split('@')[0]}
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    await signOut();
+                    router.push('/auth');
+                  } catch (error) {
+                    console.error('Sign out error:', error);
+                  }
+                }}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm text-gray-400 transition-colors bg-[#303030] hover:bg-[#404040]"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/auth"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm text-gray-400 transition-colors bg-[#303030] hover:bg-[#404040]"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
+
+      {/* Time Controls */}
+      {currentMode === 'time' && (
+        <div className="mt-4">
+          <div className="flex justify-center sm:justify-start gap-2 mb-2">
+            {[15, 30, 60, 120].map((time) => (
+              <button
+                key={time}
+                onClick={() => {
+                  setSelectedTime(time);
+                  onTimeChange(time);
+                }}
+                className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  selectedTime === time ? 'text-yellow-500 bg-[#303030]' : 'text-gray-400 bg-[#262626] hover:bg-[#303030]'
+                }`}
+              >
+                {time}
+              </button>
+            ))}
+          </div>
+          <div className="w-full h-1 bg-[#303030] rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-yellow-500 transition-all duration-100"
+              style={{ width: `${(selectedTime / 120) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Word Count Controls */}
+      {currentMode === 'words' && (
+        <div className="mt-4">
+          <div className="flex justify-center sm:justify-start gap-2 mb-2">
+            {[10, 25, 50, 100].map((count) => (
+              <button
+                key={count}
+                onClick={() => onWordCountChange(count)}
+                className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  selectedTime === count ? 'text-yellow-500 bg-[#303030]' : 'text-gray-400 bg-[#262626] hover:bg-[#303030]'
+                }`}
+              >
+                {count}
+              </button>
+            ))}
+          </div>
+          <div className="w-full h-1 bg-[#303030] rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-yellow-500 transition-all duration-100"
+              style={{ width: `${(selectedTime / 100) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
     </nav>
   );
 } 
